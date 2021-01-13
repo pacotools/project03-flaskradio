@@ -54,6 +54,30 @@ def radio_selector():
     return redirect(url_for('radio'))
 
 
+@app.route('/add_favorite', methods=["GET", "POST"])
+def add_favorite():
+    existing_station = str(mongo.db.favorites.find_one({
+        'user': session['user'],
+        'station_id': session['current_station']
+    }))
+    if existing_station == 'None':
+        s = session["current_station"]
+        station = mongo.db.stations.find_one({
+            "_id": ObjectId(s)})
+        station_info = {
+            "country_name": session['country_name'],
+            "station_id": session['current_station'],
+            "user": session['user'],
+            "url_resolved": station["url_resolved"],
+            "station_name": station["name"],
+            "homepage": station["homepage"],
+            "favicon": station["favicon"],
+            "tags": station["tags"],
+        }
+        mongo.db.favorites.insert_one(station_info)
+    return redirect(url_for('radio'))
+
+
 @app.route("/radio", methods=["GET", "POST"])
 def radio():
     countries = list(mongo.db.countries.find().sort("name", 1))
@@ -62,9 +86,6 @@ def radio():
     favorites = list(mongo.db.favorites.find(
         {'user': session['user'].lower()}))
 
-    # if session['current_station'] == "0":
-    #    i = 0
-    # else:
     i = find_station(stations)
 
     station_info = {
@@ -88,31 +109,6 @@ def find_station(station_list):
             return i
         i += 1
     return 0
-
-
-@app.route('/add_favorite', methods=["GET", "POST"])
-def add_favorite():
-    existing_station = str(mongo.db.favorites.find_one({
-        'user': session['user'],
-        'station_id': session['current_station']
-    }))
-    if existing_station == 'None':
-        station = mongo.db.stations.find({
-            '_id': session['current_station']})
-        flash(station)
-        # station_info = {
-        #    "country_name": session['country_name'],
-        #    "station_id": session['current_station'],
-        #    "user": session['user'],
-        #    "url_resolved": station.url_resolved,
-        #    "station_name": station.name,
-        #    "homepage": station.homepage,
-        #    "favicon": station.favicon,
-        #    "tags": station.tags,
-        # }
-        # flash(station_info)
-        # mongo.db.favorites.insert_one(station_info)
-    return redirect(url_for('radio'))
 
 
 @app.route('/register', methods=["GET", "POST"])
