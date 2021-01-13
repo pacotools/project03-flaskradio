@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <!-- panel radio station -->
+    <div id="dataRB" class="card">
+        <form method="POST" action="{{ url_for('radio_selector') }}">
+            <div class="panelDataRS">
+                <div class="panelUpRS">
+                    <select id="country_name" name="country_name" onchange="force_submit('select_country')"
+                            class="browser-default validate transparent" required>
+                        <option value="" disabled>Select Country</option>
+                        {% for country in countries %}
+                            {% if station_info["country_name"] == country.name %}
+                                <option value="{{ country.name }}" selected >
+                                    {{ country.name }} ({{ country.stationcount }} stations)
+                                </option>
+                            {% else %}
+                                <option value="{{ country.name }}">
+                                    {{ country.name }} ({{ country.stationcount }} stations)
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input id="select_country" type="submit" name="selector" value="country">
+                </div>
+                <div class="infoNameRS">
+                    <select id="station_id" name="station_id" onchange="force_submit('select_station')"
+                            class="browser-default validate transparent" required>
+                        <option value="" disabled>Select Station</option>
+                        {% for station in stations %}
+                            {% if station_info.station_id == station._id %}
+                                <option value="{{ station._id }}" selected>{{ station.name }}</option>
+                            {% else %}
+                                <option value="{{ station._id }}">{{ station.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input id="select_station" type="submit" name="selector" value="station">
+                </div>
+            </div>
+        </form>
+        <div id="radioControls">
+            <button onclick="playStation ( '{{ station_info.url_resolved }}' )">
+                <i class="material-icons">play_arrow</i>
+            </button>
+            <button onclick="stopStation ()">
+                <i class="material-icons">check_box_outline_blank</i>
+            </button>
+            {% if session.user %}
+                <button type="button">
+                    <a href="{{ url_for('add_favorite') }}">
+                        <i class="material-icons tooltipped">favorite_border</i>
+                    </a>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- user's favorite radio stations -->
+    {% if session.user %}
+        <ul class="collapsible z-depth-0">
+            <li>
+                <div class="collapsible-header transparent">
+                    My Stations <strong><i class="material-icons">keyboard_arrow_down</i></strong>
+                </div>
+                <div class="collapsible-body">
+                    <ul class="collapsible z-depth-0">
+                        {% for favorite in favorites %}
+                        <li>
+                            <div class="collapsible-header transparent favorite-header">
+                                <img class="responsive-img" src="{{ favorite.favicon }}" width="80px">
+                                <strong>{{ favorite.name }}</strong>
+                            </div>
+                            <div class="collapsible-body">
+                                <strong>{{ favorite.tags }}</strong><br>
+                                {{ favorite.codec }}<br>
+                                {{ favorite.bitrate }}<br>
+                                {{ favorite.homepage }}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    {% endif %}
+
+{% endblock %}
