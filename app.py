@@ -78,6 +78,16 @@ def add_favorite():
     return redirect(url_for('radio'))
 
 
+@app.route('/del_favorite/<station_id>')
+def del_favorite(station_id):
+    u = session["user"]
+    mongo.db.favorites.remove({
+        "station_id": station_id,
+        "user": u
+    })
+    return redirect(url_for('radio'))
+
+
 @app.route("/radio", methods=["GET", "POST"])
 def radio():
     countries = list(mongo.db.countries.find().sort("name", 1))

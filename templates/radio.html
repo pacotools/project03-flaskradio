@@ -68,14 +68,23 @@
                         {% for favorite in favorites %}
                         <li>
                             <div class="collapsible-header transparent favorite-header">
-                                <img class="responsive-img" src="{{ favorite.favicon }}" width="80px">
+                                <img class="responsive-img" src="{{ favorite.favicon }}" width="100px">
                                 <strong>{{ favorite.name }}</strong>
+                                <button onclick="playStation ( '{{ favorite.url_resolved }}' )">
+                                    <i class="material-icons">play_arrow</i>
+                                </button>
+                                <button onclick="stopStation ()">
+                                    <i class="material-icons">check_box_outline_blank</i>
+                                </button>
+                                <button type="button">
+                                    <a href="{{ url_for('del_favorite', station_id=favorite.station_id) }}">
+                                        <i class="material-icons tooltipped">delete_forever</i>
+                                    </a>
+                                </button>
                             </div>
                             <div class="collapsible-body">
                                 <strong>{{ favorite.tags }}</strong><br>
-                                {{ favorite.codec }}<br>
-                                {{ favorite.bitrate }}<br>
-                                {{ favorite.homepage }}
+                                <a href="{{ favorite.homepage }}">{{ favorite.homepage }}</a>
                             </div>
                         </li>
                         {% endfor %}
